@@ -336,6 +336,7 @@ int q_descend(struct list_head *head)
     return i;
 }
 
+
 /* Merge all the queues into one sorted queue, which is in ascending/descending
  * order */
 int q_merge(struct list_head *head, bool descend)
