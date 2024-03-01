@@ -166,6 +166,7 @@ bool q_delete_dup(struct list_head *head)
     element_t *entry;
     element_t *safe;
     list_for_each_entry_safe (entry, safe, head, list) {
+<<<<<<< HEAD
         while (entry->list.next != head &&
                !strcmp(entry->value,
                        list_entry(entry->list.next, element_t, list)->value)) {
@@ -178,6 +179,26 @@ bool q_delete_dup(struct list_head *head)
             safe = list_entry(entry->list.next, element_t, list);
             list_del_init(&entry->list);
             q_release_element(entry);
+=======
+        // printf("entry now=%s\n",entry->value);
+        if (entry->list.next != head &&
+            !strcmp(entry->value,
+                    list_entry(entry->list.next, element_t, list)->value)) {
+            while (
+
+                !strcmp(entry->value,
+                        list_entry(entry->list.next, element_t, list)->value)) {
+                element_t *Next = list_entry(entry->list.next, element_t, list);
+                list_del(&Next->list);
+                q_release_element(Next);
+                // printf("ee\n");
+            }
+            if (list_entry(entry->list.next, element_t, list) != safe) {
+                safe = list_entry(entry->list.next, element_t, list);
+                list_del_init(&entry->list);
+                q_release_element(entry);
+            }
+>>>>>>> e4b9b6f82c6354b49e96b946d2b90b3c90fc99ce
         }
     }
     return true;
@@ -241,6 +262,7 @@ void merge_two(struct list_head *L, struct list_head *R, bool descend)
     while (!list_empty(L) && !list_empty(R)) {
         element_t *l = list_first_entry(L, element_t, list);
         element_t *r = list_first_entry(R, element_t, list);
+<<<<<<< HEAD
         if ((descend && strcmp(l->value, r->value) > 0) ||
             (!descend && strcmp(l->value, r->value) <= 0))
             list_move_tail(&l->list, &temp);
@@ -250,6 +272,27 @@ void merge_two(struct list_head *L, struct list_head *R, bool descend)
     list_splice_tail_init(L, &temp);
     list_splice_tail_init(R, &temp);
     list_splice(&temp, L);
+=======
+        // if (strcmp(l->value, r->value) ^ descend)
+        //     list_move_tail(&r->list, &temp);
+        // else
+        //     list_move_tail(&l->list, &temp);
+        if (descend) {
+            if (strcmp(l->value, r->value) > 0)
+                list_move_tail(&l->list, &temp);
+            else
+                list_move_tail(&r->list, &temp);
+        } else {
+            if (strcmp(l->value, r->value) > 0)
+                list_move_tail(&r->list, &temp);
+            else
+                list_move_tail(&l->list, &temp);
+        }
+    }
+    list_splice(&temp, L);
+    if (!list_empty(R))
+        list_splice_tail(R, L);
+>>>>>>> e4b9b6f82c6354b49e96b946d2b90b3c90fc99ce
 }
 
 /* Sort elements of queue in ascending/descending order */
@@ -336,10 +379,12 @@ int q_descend(struct list_head *head)
     return i;
 }
 
+
 /* Merge all the queues into one sorted queue, which is in ascending/descending
  * order */
 int q_merge(struct list_head *head, bool descend)
 {
+<<<<<<< HEAD
     if (!head || list_empty(head))
         return 0;
     if (list_is_singular(head))
@@ -355,4 +400,11 @@ int q_merge(struct list_head *head, bool descend)
         r = list_entry(l->chain.next, queue_contex_t, chain);
     }
     return q_size(l->q);
+=======
+    // queue_contex_t* entry=list_entry(head,queue_contex_t,chain);
+    // queue_contex_t* safe;
+
+    // https://leetcode.com/problems/merge-k-sorted-lists/
+    return 0;
+>>>>>>> e4b9b6f82c6354b49e96b946d2b90b3c90fc99ce
 }
