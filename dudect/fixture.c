@@ -64,6 +64,29 @@ static void differentiate(int64_t *exec_times,
         exec_times[i] = after_ticks[i] - before_ticks[i];
 }
 
+static inline int compare_int64(const void *a, const void *b)
+{
+    return (*(int64_t *) a - *(int64_t *) b);
+}
+
+static int64_t percentile(int64_t *a_sorted, double which, size_t size)
+{
+    size_t array_position = (size_t) ((double) size * (double) which);
+    assert(array_position < size);
+    return a_sorted[array_position];
+}
+
+static void prepare_percentiles(int64_t *exec_times)
+{
+    qsort(exec_times, N_MEASURES, sizeof(int64_t), compare_int64);
+    for (size_t i = 0; i < N_MEASURES; i++) {
+        exec_times[i] = percentile(
+            exec_times,
+            1 - (pow(0.5, 10 * (double) (i + 1) / (double) N_MEASURES)),
+            N_MEASURES);
+    }
+}
+
 static void update_statistics(const int64_t *exec_times, uint8_t *classes)
 {
     for (size_t i = 0; i < N_MEASURES; i++) {
@@ -74,8 +97,11 @@ static void update_statistics(const int64_t *exec_times, uint8_t *classes)
 
         /* do a t-test on the execution time */
         t_push(t, difference, classes[i]);
+
+        // t-test on cropped execution times, for several cropping thresholds.
     }
 }
+
 
 static bool report(void)
 {
@@ -133,6 +159,7 @@ static bool doit(int mode)
 
     bool ret = measure(before_ticks, after_ticks, input_data, mode);
     differentiate(exec_times, before_ticks, after_ticks);
+    prepare_percentiles(exec_times);
     update_statistics(exec_times, classes);
     ret &= report();
 
@@ -170,8 +197,11 @@ static bool test_const(char *text, int mode)
     return result;
 }
 
-#define DUT_FUNC_IMPL(op) \
-    bool is_##op##_const(void) { return test_const(#op, DUT(op)); }
+#define DUT_FUNC_IMPL(op)                \
+    bool is_##op##_const(void)           \
+    {                                    \
+        return test_const(#op, DUT(op)); \
+    }
 
 #define _(x) DUT_FUNC_IMPL(x)
 DUT_FUNCS

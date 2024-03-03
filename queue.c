@@ -264,19 +264,16 @@ void q_sort(struct list_head *head, bool descend)
     LIST_HEAD(R);
     list_for_each_safe (node, safe, head) {
         if ((node == rev_node || node->next == rev_node) && rev_node != head) {
-            // rev_node is the mid one
             list_cut_position(&R, node, head->prev);
-            // printf("mid=%s\n",list_entry(node,element_t,list)->value);
+            // conquer
+            q_sort(&R, descend);
+            q_sort(head, descend);
+            // merge
+            merge_two(head, &R, descend);
             break;
         }
         rev_node = rev_node->prev;
     }
-    // conquer
-    q_sort(&R, descend);
-    q_sort(head, descend);
-
-    // merge
-    merge_two(head, &R, descend);
 }
 
 
