@@ -83,6 +83,8 @@ typedef enum {
     POS_TAIL,
     POS_HEAD,
 } position_t;
+
+
 /* Forward declarations */
 static bool q_show(int vlevel);
 
@@ -1012,8 +1014,36 @@ static bool do_next(int argc, char *argv[])
     return q_show(0);
 }
 
+extern void q_shuffle(struct list_head *head);
+//實作 shuffle 命令
+static bool do_shuffle(int argc, char *argv[])
+{
+    if (argc != 1) {
+        report(1, "%s takes no arguments", argv[0]);
+        return false;
+    }
+
+    if (!current || !current->q) {
+        report(3, "Warning: Calling shuffle on null queue");
+        return false;
+    }
+    error_check();
+
+    set_noallocate_mode(true);
+    if (exception_setup(true))
+        q_shuffle(current->q);
+    exception_cancel();
+
+    set_noallocate_mode(false);
+    q_show(3);
+    return !error_check();
+}
+
+
+
 static void console_init()
 {
+    ADD_COMMAND(shuffle, "Reorder all nodes in a random manner", "");
     ADD_COMMAND(new, "Create new queue", "");
     ADD_COMMAND(free, "Delete queue", "");
     ADD_COMMAND(prev, "Switch to previous queue", "");
