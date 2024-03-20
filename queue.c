@@ -301,7 +301,7 @@ int q_ascend(struct list_head *head)
             i++;
         }
     }
-    return 0;
+    return i;
 }
 
 /* Remove every node which has a node with a strictly greater value anywhere to
