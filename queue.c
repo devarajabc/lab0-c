@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include "list.h"
+#include "tim_sort.h"
 
 
 int compare(void *priv, struct list_head *q1, struct list_head *q2)
