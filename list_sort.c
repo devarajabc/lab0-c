@@ -81,7 +81,7 @@ __attribute__((nonnull(2, 3, 4, 5))) static void merge_final(
          * element comparison is needed, so the client's cmp()
          * routine can invoke cond_resched() periodically.
          */
-        if (unlikely(!++count))
+        if (!++count)  // unlikely() ?
             cmp(priv, b, b);
         b->prev = tail;
         tail = b;
@@ -215,7 +215,7 @@ __attribute__((nonnull(2, 3))) void list_sort(void *priv,
         for (bits = count; bits & 1; bits >>= 1)
             tail = &(*tail)->prev;
         /* Do the indicated merge */
-        if (likely(bits)) {
+        if (bits) {  // likely(
             struct list_head *a = *tail, *b = a->prev;
 
             a = merge(priv, cmp, b, a);
