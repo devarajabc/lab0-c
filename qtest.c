@@ -1141,10 +1141,35 @@ bool do_list_sort(int argc, char *argv[])
     q_show(3);
     return ok && !error_check();
 }
+extern void q_worst_case(struct list_head *head);
+bool do_worst_case(int argc, char *argv[])
+{
+    if (argc != 1) {
+        report(1, "%s takes no arguments", argv[0]);
+        return false;
+    }
+
+    if (!current || !current->q) {
+        report(3, "Warning: Calling worst_case on null queue");
+        return false;
+    }
+    error_check();
+
+    set_noallocate_mode(true);
+    if (exception_setup(true))
+        q_worst_case(current->q);
+    exception_cancel();
+
+    set_noallocate_mode(false);
+    q_show(3);
+    return !error_check();
+}
 
 
 static void console_init()
 {
+    ADD_COMMAND(worst_case,
+                "Arrange the input data into a worst-case configuration ", "");
     ADD_COMMAND(list_sort, "Linux Sort queue in ascending/descening order", "");
     ADD_COMMAND(tim_sort, "Tim Sort queue in ascending/descening order", "");
     ADD_COMMAND(shuffle, "Reorder all nodes in a random manner", "");

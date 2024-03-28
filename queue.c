@@ -5,6 +5,7 @@
 #include <time.h>
 #include "list_sort.h"
 #include "tim_sort.h"
+#include "worst_case.h"
 
 
 int compare(void *priv, struct list_head *q1, struct list_head *q2)
@@ -306,6 +307,7 @@ void q_list_sort(struct list_head *head, bool descend)
         return;
     int count = 0;
     list_sort(&count, head, compare);
+    printf("  Comparisons:    %d\n", count);
     if (descend)
         q_reverse(head);
 }
@@ -409,4 +411,11 @@ void q_shuffle(struct list_head *head)
         struct list_head *tmp = head->prev;
         list_move(del, tmp);
     }
+}
+
+void q_worst_case(struct list_head *head)
+{
+    if (q_size(head) < 2)
+        return;
+    worst_case(head);
 }
