@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "list.h"
+#include "list_sort.h"
 #include "tim_sort.h"
 
 
@@ -296,6 +296,16 @@ void q_tim_sort(struct list_head *head, bool descend)
     int count = 0;
     timsort(&count, head, compare);
     printf("  Comparisons:    %d\n", count);
+    if (descend)
+        q_reverse(head);
+}
+
+void q_list_sort(struct list_head *head, bool descend)
+{
+    if (q_size(head) < 2)
+        return;
+    int count = 0;
+    list_sort(&count, head, compare);
     if (descend)
         q_reverse(head);
 }
