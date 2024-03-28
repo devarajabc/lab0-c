@@ -3,7 +3,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "list.h"
 
+
+int compare(void *priv, struct list_head *q1, struct list_head *q2)
+{
+    if (q1 == q2)
+        return 0;
+    element_t *e1 = list_entry(q1, element_t, list);
+    element_t *e2 = list_entry(q2, element_t, list);
+    if (priv)
+        *((int *) priv) += 1;
+    return strcmp(e1->value, e2->value);
+}
 /* Notice: sometimes, Cppcheck would find the potential NULL pointer bugs,
  * but some of them cannot occur. You can suppress them by adding the
  * following line.
@@ -274,6 +286,17 @@ void q_sort(struct list_head *head, bool descend)
         }
         rev_node = rev_node->prev;
     }
+}
+
+void q_tim_sort(struct list_head *head, bool descend)
+{
+    if (q_size(head) < 2)
+        return;
+    int count = 0;
+    timsort(&count, head, compare);
+    printf("  Comparisons:    %d\n", count);
+    if (descend)
+        q_reverse(head);
 }
 
 
