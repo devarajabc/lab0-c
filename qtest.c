@@ -1112,7 +1112,7 @@ bool do_list_sort(int argc, char *argv[])
 
     set_noallocate_mode(true);
     if (current && exception_setup(true))
-        q_linux_sort(current->q, descend);
+        q_list_sort(current->q, descend);
     exception_cancel();
     set_noallocate_mode(false);
 
