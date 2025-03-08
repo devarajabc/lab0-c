@@ -30,6 +30,25 @@ void q_free(struct list_head *head)
     }
 }
 
+void merge_two(struct list_head *L, struct list_head *R, bool descend)
+{
+    if (!L || !R)
+        return;
+    LIST_HEAD(temp);
+    while (!list_empty(L) && !list_empty(R)) {
+        element_t *l = list_first_entry(L, element_t, list);
+        element_t *r = list_first_entry(R, element_t, list);
+        if (strcmp(l->value, r->value) < 0 || strcmp(l->value, r->value) == 0)
+            list_move_tail(&l->list, &temp);
+        else
+            list_move_tail(&r->list, &temp);
+    }
+    list_splice_tail_init(L, &temp);
+    list_splice_tail_init(R, &temp);
+    list_splice(&temp, L);
+    if (descend)
+        q_reverse(&temp);
+}
 
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
@@ -159,7 +178,29 @@ void q_reverseK(struct list_head *head, int k)
 }
 
 /* Sort elements of queue in ascending/descending order */
-void q_sort(struct list_head *head, bool descend) {}
+void q_sort(struct list_head *head, bool descend)
+{
+    if (!head || list_empty(head) || list_is_singular(head))
+        return;
+    // find the middle and divide it
+    struct list_head *node;
+    struct list_head *safe;
+    struct list_head *rev_node = head->prev;
+    LIST_HEAD(R);
+    list_for_each_safe(node, safe, head) {
+        if ((node == rev_node || node->next == rev_node) && rev_node != head) {
+            list_cut_position(&R, node, head->prev);
+            // conquer
+            q_sort(&R, descend);
+            q_sort(head, descend);
+            // merge
+            merge_two(head, &R, descend);
+            break;
+        }
+        rev_node = rev_node->prev;
+    }
+}
+
 
 /* Remove every node which has a node with a strictly less value anywhere to
  * the right side of it */
