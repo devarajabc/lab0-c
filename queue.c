@@ -16,12 +16,36 @@ void q_free(struct list_head *head) {}
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
 {
+    if (!head || !s)
+        return false;
+    element_t *tmp = malloc(sizeof(element_t));
+    if (!tmp)
+        return false;
+    tmp->value =
+        strdup(s);  // It returns NULL if insufficient memory was available.
+    if (!tmp->value) {
+        free(tmp);
+        return false;
+    }
+    list_add(&tmp->list, head);
     return true;
 }
 
 /* Insert an element at tail of queue */
 bool q_insert_tail(struct list_head *head, char *s)
 {
+    if (!head || !s)
+        return false;
+    element_t *tmp = malloc(sizeof(element_t));
+    if (!tmp)
+        return false;
+    tmp->value =
+        strdup(s);  // It returns NULL if insufficient memory was available.
+    if (!tmp->value) {
+        free(tmp);
+        return false;
+    }
+    list_add_tail(&tmp->list, head);
     return true;
 }
 
